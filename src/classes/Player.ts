@@ -1,4 +1,4 @@
-import { DIMENSIONS, GRAVITY, SPEED } from "../constants.ts";
+import { DIMENSIONS, GRAVITY, SPEED } from "../constants/constants";
 
 export default class Player {
   x: number;

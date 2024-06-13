@@ -19,8 +19,7 @@ import {
   PLAYER_WIDTH,
   START_JUMP_HEIGHT,
   STATES,
-  FPS,
-} from "./constants.ts";
+} from "./constants/constants.ts";
 
 const canvas = document.querySelector<HTMLCanvasElement>("#canvas")!;
 const ctx = canvas.getContext("2d")!;
@@ -35,7 +34,7 @@ let score = 0;
 let platforms: (MovingPlatform | Platform)[] = [];
 let lastPlatform: Platform | MovingPlatform;
 
-function generatePlatforms(minimumPlatforms = 5) {
+function generatePlatforms(minimumPlatforms = 15) {
   const totalPlatforms = platforms.length + minimumPlatforms;
 
   for (let i = platforms.length; i < totalPlatforms; i++) {
@@ -81,18 +80,11 @@ function updatePlatforms() {
     if (player.y < DIMENSIONS.CANVAS_HEIGHT / 2) {
       platform.y += 5;
     }
-    console.log(platform);
-    if (platform.y > DIMENSIONS.CANVAS_HEIGHT) {
-      score += 1;
-    }
-    // if (player.y < DIMENSIONS.CANVAS_HEIGHT / 2) {
-    //   platform.y += 5;
-    //   score += 2;
-    // }
 
     if (platform.y + PLATFORM_HEIGHT > DIMENSIONS.CANVAS_HEIGHT) {
       platforms.shift();
       generatePlatforms();
+      score += 1;
     }
   }
 }
@@ -108,7 +100,7 @@ function isOnPlatform(player: Player, platform: Platform) {
 function restart() {
   score = 0;
   platforms = [];
-  generatePlatforms(5);
+  generatePlatforms();
 
   const playerX = platforms[0].x + (PLATFORM_WIDTH - PLAYER_WIDTH) / 2;
   const playerY = DIMENSIONS.CANVAS_HEIGHT - PLATFORM_GAP - PLAYER_HEIGHT - 50;
@@ -220,14 +212,14 @@ function play() {
     currentState = STATES[2];
   }
 
+  updatePlatforms();
+  player.draw();
+
   ctx.font = "15px";
   ctx.fillText(`Score: ${score}`, 5, 20);
 
   ctx.font = "15px";
-  ctx.fillText(`High Score: ${getLocalStorage("HIGHSCORE") ?? 0}`, 5, 40);
-
-  updatePlatforms();
-  player.draw();
+  ctx.fillText(`High Score: ${getLocalStorage("HIGHSCORE") ?? 0}`, 5, 50);
 }
 
 function end() {
@@ -259,32 +251,23 @@ const player = new Player(
   ctx,
 );
 
-const interval = 1000 / FPS; // Interval in milliseconds
-let lastTime = performance.now();
-
-function animate(currentTime: number) {
+function animate() {
   ctx.clearRect(0, 0, DIMENSIONS.CANVAS_WIDTH, DIMENSIONS.CANVAS_HEIGHT);
-  let elapsed = currentTime - lastTime;
 
-  // If enough time has passed, update
-  if (elapsed >= interval) {
-    lastTime = currentTime - (elapsed % interval);
-    switch (currentState) {
-      case STATES[0]:
-        start();
-        break;
-      case STATES[1]:
-        play();
-        break;
-      case STATES[2]:
-        end();
-        break;
-      default:
-        break;
-    }
+  switch (currentState) {
+    case STATES[0]:
+      start();
+      break;
+    case STATES[1]:
+      play();
+      break;
+    case STATES[2]:
+      end();
+      break;
+    default:
+      break;
   }
   requestAnimationFrame(animate);
-  // setInterval(animate, 1000/6)
 }
 
-animate(lastTime);
+animate();
