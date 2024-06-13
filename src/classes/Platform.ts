@@ -27,7 +27,6 @@ export default class Platform {
   }
 
   draw() {
-    console.log(this.x, this.y);
     this.ctx.drawImage(
       this.img,
       0,

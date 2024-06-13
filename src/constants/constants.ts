@@ -17,3 +17,5 @@ export const GRAVITY = 5;
 
 export const MAX_JUMP_HEIGHT = 150;
 export const START_JUMP_HEIGHT = 140;
+
+export const FPS = 60;

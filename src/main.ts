@@ -2,6 +2,7 @@ import "./style.css";
 import leftImg from "./assets/blueL.png";
 import rightImg from "./assets/blueR.png";
 import enemeySheet from "./assets/enemySheet.png";
+import startImageSrc from "./assets/atlas3.webp";
 
 import Player from "./classes/Player.ts";
 import Platform from "./classes/Platform.ts";
@@ -18,6 +19,7 @@ import {
   PLAYER_WIDTH,
   START_JUMP_HEIGHT,
   STATES,
+  FPS,
 } from "./constants.ts";
 
 const canvas = document.querySelector<HTMLCanvasElement>("#canvas")!;
@@ -78,8 +80,15 @@ function updatePlatforms() {
 
     if (player.y < DIMENSIONS.CANVAS_HEIGHT / 2) {
       platform.y += 5;
-      score += 2;
     }
+    console.log(platform);
+    if (platform.y > DIMENSIONS.CANVAS_HEIGHT) {
+      score += 1;
+    }
+    // if (player.y < DIMENSIONS.CANVAS_HEIGHT / 2) {
+    //   platform.y += 5;
+    //   score += 2;
+    // }
 
     if (platform.y + PLATFORM_HEIGHT > DIMENSIONS.CANVAS_HEIGHT) {
       platforms.shift();
@@ -136,7 +145,7 @@ const startPlatform = new Platform(
 
 function start() {
   const startImage = new Image();
-  startImage.src = "atlas3.webp";
+  startImage.src = startImageSrc;
   ctx.drawImage(startImage, 641, 0, 640, 960, 0, 0, 640, 1024);
 
   ctx.font = "25px Arial";
@@ -250,24 +259,32 @@ const player = new Player(
   ctx,
 );
 
-function animate() {
+const interval = 1000 / FPS; // Interval in milliseconds
+let lastTime = performance.now();
+
+function animate(currentTime: number) {
   ctx.clearRect(0, 0, DIMENSIONS.CANVAS_WIDTH, DIMENSIONS.CANVAS_HEIGHT);
+  let elapsed = currentTime - lastTime;
 
-  switch (currentState) {
-    case STATES[0]:
-      start();
-      break;
-    case STATES[1]:
-      play();
-      break;
-    case STATES[2]:
-      end();
-      break;
-    default:
-      break;
+  // If enough time has passed, update
+  if (elapsed >= interval) {
+    lastTime = currentTime - (elapsed % interval);
+    switch (currentState) {
+      case STATES[0]:
+        start();
+        break;
+      case STATES[1]:
+        play();
+        break;
+      case STATES[2]:
+        end();
+        break;
+      default:
+        break;
+    }
   }
-
   requestAnimationFrame(animate);
+  // setInterval(animate, 1000/6)
 }
 
-animate();
+animate(lastTime);
