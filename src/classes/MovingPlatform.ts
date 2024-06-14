@@ -1,5 +1,5 @@
 import Platform from "./Platform.ts";
-import { DIMENSIONS } from "../constants.ts";
+import { DIMENSIONS } from "../constants/constants.ts";
 
 export default class MovingPlatform extends Platform {
   speedX: number;
